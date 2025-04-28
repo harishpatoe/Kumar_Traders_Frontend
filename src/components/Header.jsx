@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Input, Button } from "antd";
+import React, { useState, useContext } from "react";
+import { Input, Button, Badge } from "antd";
 import { SearchOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import {
   FaFacebook,
@@ -10,28 +10,27 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { CartContext } from "./CartContext";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
+  const { cart } = useContext(CartContext); // <-- grab cart from context
+
   const handleSearch = () => {
     const trimmedQuery = searchQuery.trim().toLowerCase();
-  
     if (trimmedQuery !== "") {
       const capitalized =
         trimmedQuery.charAt(0).toUpperCase() + trimmedQuery.slice(1);
-  
       navigate(`/${capitalized}Details`);
       setSearchQuery("");
     }
   };
-  
 
   return (
     <div className="w-full bg-gray-100 border-b border-gray-300 py-4">
       <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row justify-between items-center px-6 space-y-4 md:space-y-0">
-        
         {/* Left - Social & Contact Info */}
         <div className="flex items-center flex-wrap gap-4 text-gray-700">
           {[FaFacebook, FaTwitter, FaInstagram, FaLinkedin].map((Icon, idx) => (
@@ -62,18 +61,16 @@ const Header = () => {
 
         {/* Right - Cart & Auth Buttons */}
         <div className="flex items-center gap-4 text-gray-700">
-          <ShoppingCartOutlined
-            className="text-2xl cursor-pointer hover:text-[#c69639]"
-            onClick={() => navigate("/CartPage")}
-          />
+          <Badge count={cart.reduce((acc, item) => acc + item.quantity, 0)} showZero>
+            <ShoppingCartOutlined
+              className="text-2xl cursor-pointer hover:text-[#c69639]"
+              onClick={() => navigate("/CartPage")}
+            />
+          </Badge>
 
           <Link to="/Login">
             <Button
-              style={{
-                backgroundColor: "#c69639",
-                color: "#fff",
-                border: "none",
-              }}
+              style={{ backgroundColor: "#c69639", color: "#fff", border: "none" }}
               className="hover:!bg-[#b18330] active:!bg-[#a07228]"
             >
               Login
@@ -82,11 +79,7 @@ const Header = () => {
 
           <Link to="/SignUp">
             <Button
-              style={{
-                backgroundColor: "#c69639",
-                color: "#fff",
-                border: "none",
-              }}
+              style={{ backgroundColor: "#c69639", color: "#fff", border: "none" }}
               className="hover:!bg-[#b18330] active:!bg-[#a07228]"
             >
               Register

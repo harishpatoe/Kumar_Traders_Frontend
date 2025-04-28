@@ -1,42 +1,19 @@
-import React, { createContext, useState, useContext } from 'react';
-import { useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
-const CartContext = createContext();
+// Create context
+export const CartContext = createContext();
 
-export const useCart = () => useContext(CartContext);
+// Custom hook for easy consumption
+export const useCart = () => {
+  return useContext(CartContext);
+};
 
+// Provider component
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-  
-
-  // Add item to cart
-  const addToCart = (product) => {
-    setCart((prevCart) => {
-      const exists = prevCart.find((item) => item.id === product.id);
-      if (exists) {
-        return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      } else {
-        return [...prevCart, { ...product, quantity: 1 }];
-      }
-    });
-  };
-  
-  
-  
-
-  // Remove item from cart
-  const removeFromCart = (productId) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
-  };
+  const [cart, setCart] = useState([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cart, setCart }}>
       {children}
     </CartContext.Provider>
   );

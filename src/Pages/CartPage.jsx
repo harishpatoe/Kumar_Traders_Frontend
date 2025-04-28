@@ -4,6 +4,7 @@ import { Button } from "antd";
 import Header from "../components/Header";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import axios from "axios";
 
 const CartPage = () => {
   const { cart, removeFromCart } = useCart();
@@ -11,7 +12,17 @@ const CartPage = () => {
   const handleRemoveFromCart = (productId) => {
     removeFromCart(productId);
   };
-
+  const handleCheckout = async () => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/auth/create-checkout-session", {
+        cartItems: cart,
+      });
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
+  };
+  
   if (!cart || cart.length === 0) {
     return (
       <>
@@ -40,7 +51,7 @@ const CartPage = () => {
                   <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded-md" />
                 )}
                 <div>
-                  <h3 className="text-lg font-semibold">{product.name}</h3>
+                  <h3 className="text-lg font-semibold text-black">{product.name}</h3>
                   <p className="text-gray-600">₹{product.price} x {product.quantity}</p>
                   <p className="font-semibold text-gray-800">Subtotal: ₹{product.price * product.quantity}</p>
                 </div>
@@ -54,13 +65,18 @@ const CartPage = () => {
 
         {/* Total Price Section */}
         <div className="mt-6 p-4 bg-white shadow-md rounded-lg">
-          <h3 className="text-xl font-bold">Total Amount</h3>
+          <h3 className="text-xl font-bold text-black">Total Amount</h3>
           <p className="text-gray-800 text-lg">
             ₹{cart.reduce((total, item) => total + item.price * item.quantity, 0)}
           </p>
-          <Button type="primary" className="mt-3 bg-green-600 hover:bg-green-700 text-white">
-            Proceed to Pay
-          </Button>
+          <Button
+  type="primary"
+  className="mt-3 bg-green-600 hover:bg-green-700 text-white"
+  onClick={handleCheckout}
+>
+  Proceed to Pay
+</Button>
+
         </div>
       </div>
       <Footer />
